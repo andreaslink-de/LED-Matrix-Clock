@@ -14,15 +14,15 @@ This project describes a smart **LED-Matrix Clock**, which is readable without g
 - show local time in big letters
 - grab exact current time from internet
 - change brightness
-- be turned off, if being to bright
-- can be turned on with a long touch
-- connects to the local MQTT server
-- has too touch buttons and posts the action to the MQTT server
-- subscripe to a topic of outside temperature
+- be turned off aka fully dimmed (if being to bright)
+- can be turned on again - permanently or only on demand
+- connects to the (local) MQTT server
+- has two touch buttons and posts the actions to the MQTT server aka broker
+- subscribes to a topic of an outside temperature
 - can show outside temperature on a touch
-- has build sensor to measure rooms local temperature and humidity
-- can show sliding messages to transmit information
-- can show blinking alarm messages requiring attention
+- has build in sensor to measure rooms local temperature and humidity (to provide via MQTT)
+- can show sliding messages to transmit information (sent via MQTT)
+- can show blinking alarm messages requiring attention (sent via MQTT)
 
 
 ## Technical Components
@@ -39,7 +39,7 @@ This clock is made of/implements...
 ## MQTT
 
 After a successful start up and an active WiFi connection, the clock connects to the MQTT broker and sends some global health and info data.
-The status is sent "retained" and can be used, if the device is still there or lost the connection to the broker.
+The status is sent "retained" and can be used to determine, if the device is still there or has lost the connection to the broker (last will).
 
 ### Topics sent
 
@@ -57,15 +57,17 @@ Examples:
 
 ### Buttons
 
-If the buttons are pressed, each pressing aka touching event is also sent via MQTT. Some example events are:
+If the buttons are pressed, each pressing aka touching event is also sent via MQTT.
+Some example events are:
 
  -  Button 1 clicked/touched:
     - 'zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/button1/touched': '1'
     - Typically to either show the outside temperature once
-    - Or if display is turend off, show the time for some seconds
+    - Or if display is turned off, show the time for some seconds
  -  Button 1 long pressed:
     - 'zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/button1/long': '1'
     - Turning LED Matrix off... good night!
+    - If display is off, turn it on again
  -  Button 2 clicked/touched:
     - 'zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/button2/touched': '1'
     - Free event to implement/use in homeautomation system, e.g. turn on a night lamp
@@ -74,7 +76,7 @@ If the buttons are pressed, each pressing aka touching event is also sent via MQ
     - Free event to implement/use in homeautomation system, e.g. turn on lights
  - Button 2 long pressed:
     - 'zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/button2/long': '1'
-    - Free event to implement/use in homeautomation system, e.g. turn on alarm
+    - Free event to implement/use in homeautomation system, e.g. open the blinds
   
  **Remind:**
  If Button 1 is pushed during boot, it will force the WiFi Manager to start up, so setup can be changed!
@@ -83,48 +85,49 @@ If the buttons are pressed, each pressing aka touching event is also sent via MQ
 
 ### Subscriptions and Commands
 
-After reboot and successful connection to the MQTT broker the clock subscribes to the following topics (examples are according to former setup).
+After reboot and successful connection to the MQTT broker the clock subscribes to the following topics (examples are according to initial setup via WiFi Manager).
 
 **Subscribing to MQTT topics...**
 - zuhause/garten/kinderhaus/aussen/temperatur
-  - Value is scrolled once when button 1 is pushed
-- zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/command/reboot
+  - Last provided value is scrolled once when button 1 is pushed/touched
+  - If no value is there, nothing happens
+- zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/command/**reboot**
   - If value is 1, the clock is rebooted
-- zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/command/led
+- zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/command/**led**
   - If value is 1, the LED on the ESP8266 is turned on
   - If value is 0, the LED on the ESP8266 is turned off
   - If value is 2, the LED on the ESP8266 is toggled
-  - Info: This function was implemented for testing and development purposes and does not give a real value.
-- zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/command/deletewificonfig
+  - Info: This function was implemented for testing and development purposes and does not give any real value.
+- zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/command/**deletewificonfig**
   - Deletes the WiFi config and forces the WiFi Manager to kick in with the reboot
   - Triggers a reboot
-- zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/command/factoryreset
+- zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/command/**factoryreset**
   - Well, all is gone as the SPIFFS is fully wiped
-- zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/command/showmessage
+- zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/command/**showmessage**
   - Scrolls the given text two times over the matrix
   - Can be used to transmit urgent short messages, e.g. by the home automation system
-- zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/command/showtext
+- zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/command/**showtext**
   - Shows a text with max. 5 chars flashing on highest brightness
   - Message is blinking a few times and then disappears again
   - Can be used to send e.g. 'ALARM' or any other <=5 char word
-- zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/command/setledmatrixstatus
+- zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/command/**setledmatrixstatus**
   - If value is 1, the LED matrix is turned on
   - If value is 0, the LED matrix is turned off
   - It can be used to automatically turn a display on and off triggered by a home automation system, such it is off in the nights (if someone is sensitive) or if no one is a home
   - Value is also set/influenced/changed when holding button 1
-- zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/command/setledmatrixbrightness
+- zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/command/**setledmatrixbrightness**
   - Sets the brightness between 1 and 15
 
 ## Case
 
 The case is 3D printed and the STL is also available [here](./case/Clock-MainCase_LED-Matrix-ESP8266_v1.stl). Currently the back lid is missing, as I am still working on this one.
 
-I have printed my case with common cheap black PLA on an Prusa MK3S and it is the first print.
+I have printed my case with common cheap black PLA on an Prusa MK3S and it is the first print shown on the pictures here. Print time was at around 5h.
 
 ### Outstanding todos:
 - Optimze the clips at the touch sensors --> Make them slightly thinner
 - Slightly widen the USB Port hole
-- Upload finshed back lid and add pictures
+- Upload finshed back lid and add more pictures
 
 ----------
 
