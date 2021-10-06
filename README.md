@@ -6,17 +6,16 @@ Ok, another clock you ask, what is the purpose and what makes it special?
 Well, as I am shortsighted and as I am sleeping without my glasses, I needed to have a clock on my nightstand, which is not too big, but big enough to be read without glasses in the night. It also has to be readable, but not too bright to disturb. It has to be exact and probably also slightly smart - and so I decided to create my own.
 
 
-_//Pictures here_
-
+![LED-Matrix-Clock 22:38](./resources/LED-Matrix-Clock_2238.jpg "LED-Matrix-Clock 22:38")
 
 This project describes a smart **LED-Matrix Clock**, which is readable without glasses in the night including some smart touch buttons and a temp/humidity sensor.
 
-This clock is able to...
+**This clock is able to...**
 - show local time in big letters
-- change brightness
 - grab exact current time from internet
+- change brightness
 - be turned off, if being to bright
-- can be turned on with a touch
+- can be turned on with a long touch
 - connects to the local MQTT server
 - has too touch buttons and posts the action to the MQTT server
 - subscripe to a topic of outside temperature
@@ -35,7 +34,115 @@ This clock is made of/implements...
  - two touch buttons (one dedicated and one multipurpose)
  - Self designed black case (PLA) to dimm the brightness and hold it all together
 
+
+
+## MQTT
+
+After a successful start up and an active WiFi connection, the clock connects to the MQTT broker and sends some global health and info data.
+The status is sent "retained" and can be used, if the device is still there or lost the connection to the broker.
+
+### Topics sent
+
+Examples:
+- 'zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/status': 'online'
+- 'zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/clientid': 'IoTDevice-42AFFE'
+- 'zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/devicename': 'iotdevice-clock'
+- 'zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/version': '0.3'
+- 'zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/ssid': ''IoT-Hausbus''
+- 'zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/ip': '192.168.123.181'
+- 'zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/mac': '50:02:91:42:AF:FE'
+- 'zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/voltage': '3.089'
+- 'zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/temperature': '20.1'
+- 'zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/humidity': '41'
+
+### Buttons
+
+If the buttons are pressed, each pressing aka touching event is also sent via MQTT. Some example events are:
+
+ -  Button 1 clicked/touched:
+    - 'zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/button1/touched': '1'
+    - Typically to either show the outside temperature once
+    - Or if display is turend off, show the time for some seconds
+ -  Button 1 long pressed:
+    - 'zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/button1/long': '1'
+    - Turning LED Matrix off... good night!
+ -  Button 2 clicked/touched:
+    - 'zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/button2/touched': '1'
+    - Free event to implement/use in homeautomation system, e.g. turn on a night lamp
+ - Button 2 double clicked/touched:
+    - 'zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/button2/doubletouched': '1'
+    - Free event to implement/use in homeautomation system, e.g. turn on lights
+ - Button 2 long pressed:
+    - 'zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/button2/long': '1'
+    - Free event to implement/use in homeautomation system, e.g. turn on alarm
+  
+ **Remind:**
+ If Button 1 is pushed during boot, it will force the WiFi Manager to start up, so setup can be changed!
+
+
+
+### Subscriptions and Commands
+
+After reboot and successful connection to the MQTT broker the clock subscribes to the following topics (examples are according to former setup).
+
+**Subscribing to MQTT topics...**
+- zuhause/garten/kinderhaus/aussen/temperatur
+  - Value is scrolled once when button 1 is pushed
+- zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/command/reboot
+  - If value is 1, the clock is rebooted
+- zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/command/led
+  - If value is 1, the LED on the ESP8266 is turned on
+  - If value is 0, the LED on the ESP8266 is turned off
+  - If value is 2, the LED on the ESP8266 is toggled
+  - Info: This function was implemented for testing and development purposes and does not give a real value.
+- zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/command/deletewificonfig
+  - Deletes the WiFi config and forces the WiFi Manager to kick in with the reboot
+  - Triggers a reboot
+- zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/command/factoryreset
+  - Well, all is gone as the SPIFFS is fully wiped
+- zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/command/showmessage
+  - Scrolls the given text two times over the matrix
+  - Can be used to transmit urgent short messages, e.g. by the home automation system
+- zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/command/showtext
+  - Shows a text with max. 5 chars flashing on highest brightness
+  - Message is blinking a few times and then disappears again
+  - Can be used to send e.g. 'ALARM' or any other <=5 char word
+- zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/command/setledmatrixstatus
+  - If value is 1, the LED matrix is turned on
+  - If value is 0, the LED matrix is turned off
+  - It can be used to automatically turn a display on and off triggered by a home automation system, such it is off in the nights (if someone is sensitive) or if no one is a home
+  - Value is also set/influenced/changed when holding button 1
+- zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/command/setledmatrixbrightness
+  - Sets the brightness between 1 and 15
+
+## Case
+
+The case is 3D printed and the STL is also available [here](./case/Clock-MainCase_LED-Matrix-ESP8266_v1.stl). Currently the back lid is missing, as I am still working on this one.
+
+I have printed my case with common cheap black PLA on an Prusa MK3S and it is the first print.
+
+### Outstanding todos:
+- Optimze the clips at the touch sensors --> Make them slightly thinner
+- Slightly widen the USB Port hole
+- Upload finshed back lid and add pictures
+
 ----------
 
- _Remind, this is still work in progress_
- 
+
+## Pictures
+
+See following some more pictures:
+
+![LED-Matrix-Clock 8x32](./resources/LED-Matrix-Clock_barebone.jpg "LED-Matrix 8x32")
+
+![LED-Matrix-Clock](./resources/LED-Matrix-Clock_matrix-back.jpg "LED-Matrix Back")
+
+![LED-Matrix-Clock soldered ES8266](./resources/LED-Matrix-Clock_ESP8266_dirty-soldering.jpg "LED-Matrix ESP8266 WeMos D1 Mini")
+
+![LED-Matrix-Clock Touch Sensor](./resources/LED-Matrix-Clock_TouchSensor_installation.jpg "LED-Matrix Clock Touch Sensor Installation")
+
+![LED-Matrix-Clock ESP8266](./resources/LED-Matrix-Clock_ESP8266_installation.jpg "LED-Matrix Clock ESP8266 Installation")
+
+![LED-Matrix-Clock Cableing](./resources/LED-Matrix-Clock_MainCase_installation.jpg "LED-Matrix Clock Cableing")
+
+![LED-Matrix-Clock 22:37](./resources/LED-Matrix-Clock_2237.jpg "LED-Matrix-Clock 22:37")
