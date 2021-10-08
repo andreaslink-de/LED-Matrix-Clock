@@ -5,12 +5,12 @@ Ok, another clock you ask, what is the purpose and what makes it special?
 
 Well, as I am shortsighted and as I am sleeping without my glasses, I needed to have a clock on my nightstand, which is not too big, but big enough to be read without glasses in the night. It also has to be readable, but not too bright to disturb. It has to be exact and probably also slightly smart - and so I decided to create my own.
 
-
 ![LED-Matrix-Clock 22:38](./resources/LED-Matrix-Clock_2238.jpg "LED-Matrix-Clock 22:38")
 
 This project describes a smart **LED-Matrix Clock**, which is readable without glasses in the night including some smart touch buttons and a temp/humidity sensor.
 
 **This clock is able to...**
+
 - show local time in big letters
 - grab exact current time from internet
 - change brightness
@@ -24,17 +24,15 @@ This project describes a smart **LED-Matrix Clock**, which is readable without g
 - can show sliding messages to transmit information (sent via MQTT)
 - can show blinking alarm messages requiring attention (sent via MQTT)
 
-
 ## Technical Components
 
 This clock is made of/implements...
- - an ESP8266 (as WeMos D1 Mini) as core CPU
- - four chained LED matrix (8x8) elements up to a visible 8x32 LED-Matrix
- - a SHT21 for local temperature and humidity measurement
- - two touch buttons (one dedicated and one multipurpose)
- - Self designed black case (PLA) to dimm the brightness and hold it all together
 
-
+- an ESP8266 (as WeMos D1 Mini) as core CPU
+- four chained LED matrix (8x8) elements up to a visible 8x32 LED-Matrix
+- a SHT21 for local temperature and humidity measurement
+- two touch buttons (one dedicated and one multipurpose)
+- Self designed black case (PLA) to dimm the brightness and hold it all together
 
 ## MQTT
 
@@ -44,6 +42,7 @@ The status is sent "retained" and can be used to determine, if the device is sti
 ### Topics sent
 
 Examples:
+
 - 'zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/status': 'online'
 - 'zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/clientid': 'IoTDevice-42AFFE'
 - 'zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/devicename': 'iotdevice-clock'
@@ -60,34 +59,33 @@ Examples:
 If the buttons are pressed, each pressing aka touching event is also sent via MQTT.
 Some example events are:
 
- -  Button 1 clicked/touched:
-    - 'zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/button1/touched': '1'
+- Button 1 clicked/touched:
+  - 'zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/button1/touched': '1'
     - Typically to either show the outside temperature once
     - Or if display is turned off, show the time for some seconds
- -  Button 1 long pressed:
-    - 'zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/button1/long': '1'
-    - Turning LED Matrix off... good night!
-    - If display is off, turn it on again
- -  Button 2 clicked/touched:
-    - 'zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/button2/touched': '1'
-    - Free event to implement/use in homeautomation system, e.g. turn on a night lamp
- - Button 2 double clicked/touched:
-    - 'zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/button2/doubletouched': '1'
-    - Free event to implement/use in homeautomation system, e.g. turn on lights
- - Button 2 long pressed:
-    - 'zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/button2/long': '1'
-    - Free event to implement/use in homeautomation system, e.g. open the blinds
+- Button 1 long pressed:
+  - 'zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/button1/long': '1'
+  - Turning LED Matrix off... good night!
+  - If display is off, turn it on again
+- Button 2 clicked/touched:
+  - 'zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/button2/touched': '1'
+  - Free event to implement/use in homeautomation system, e.g. turn on a night lamp
+- Button 2 double clicked/touched:
+  - 'zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/button2/doubletouched': '1'
+  - Free event to implement/use in homeautomation system, e.g. turn on lights
+- Button 2 long pressed:
+  - 'zuhause/haus/schlafzimmer/iotdevice-clock/AndreasClockDevice/button2/long': '1'
+  - Free event to implement/use in homeautomation system, e.g. open the blinds
   
  **Remind:**
  If Button 1 is pushed during boot, it will force the WiFi Manager to start up, so setup can be changed!
-
-
 
 ### Subscriptions and Commands
 
 After reboot and successful connection to the MQTT broker the clock subscribes to the following topics (examples are according to initial setup via WiFi Manager).
 
 **Subscribing to MQTT topics...**
+
 - zuhause/garten/kinderhaus/aussen/temperatur
   - Last provided value is scrolled once when button 1 is pushed/touched
   - If no value is there, nothing happens
@@ -120,17 +118,21 @@ After reboot and successful connection to the MQTT broker the clock subscribes t
 
 ## Case
 
-The case is 3D printed and the STL is also available [here](./case/Clock-MainCase_LED-Matrix-ESP8266_v1.stl). Currently the back lid is missing, as I am still working on this one.
+The case is 3D printed and the STLs are also available. Please find the main case [here](./case/Clock-MainCase_LED-Matrix-ESP8266_v1.stl). A first version of the back lid is added [here](./case/Clock-BackLid_LED-Matrix-ESP8266_v1.stl) as well, but I am still working on this one (as I forgot a holder and hole for the SHT21 sensor \*facepalm\*).
 
-I have printed my case with common cheap black PLA on an Prusa MK3S and it is the first print shown on the pictures here. Print time was at around 5h.
+I have printed my case with common cheap black PLA on an Prusa MK3S and it is the first print shown on the pictures here. My print time was at around 5h to 6h.
+The back lid is screwed on the case by melting some M3 nuts into the holes before. I like things screwed and no clips, which can break :-).
 
-### Outstanding todos:
+**Remind:** I recommand using plain _black PLA_ (or maybe PETG) to get the best effect of the LED matrix display shining though the front. I tried with white, but this was too bright for me.
+
+### Outstanding todos
+
 - Optimze the clips at the touch sensors --> Make them slightly thinner
 - Slightly widen the USB Port hole
 - Upload finshed back lid and add more pictures
+- Add a sensor hole to the back lid
 
 ----------
-
 
 ## Pictures
 
