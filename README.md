@@ -129,7 +129,7 @@ The back lid is screwed on the case by melting some M3 nuts into the holes befor
 
 - Optimze the clips at the touch sensors --> Make them slightly thinner
 - Slightly widen the USB Port hole
-- Upload finshed back lid and add more pictures
+- Upload finished back lid and add corresponding pictures
 - Add a sensor hole to the back lid
 
 ----------
@@ -144,10 +144,22 @@ See following some more pictures:
 
 ![LED-Matrix-Clock soldered ES8266](./resources/LED-Matrix-Clock_ESP8266_dirty-soldering.jpg "LED-Matrix ESP8266 WeMos D1 Mini")
 
+![LED-Matrix-Clock soldered ES8266](./resources/LED-Matrix-Clock_ESP8266_dirty-soldering2.jpg "LED-Matrix ESP8266 WeMos D1 Mini")
+
+![LED-Matrix-Clock soldered ES8266](./resources/LED-Matrix-Clock_ESP8266_dirty-soldering3.jpg "LED-Matrix ESP8266 WeMos D1 Mini")
+
 ![LED-Matrix-Clock Touch Sensor](./resources/LED-Matrix-Clock_TouchSensor_installation.jpg "LED-Matrix Clock Touch Sensor Installation")
 
 ![LED-Matrix-Clock ESP8266](./resources/LED-Matrix-Clock_ESP8266_installation.jpg "LED-Matrix Clock ESP8266 Installation")
 
+![LED-Matrix-Clock Display, Touch Sensors, nuts](./resources/LED-Matrix-Clock_Case_opened.jpg "LED-Matrix Clock Display and Touch Sensor installed, all hot glue fixed, M3 screw nuts")
+
 ![LED-Matrix-Clock Cableing](./resources/LED-Matrix-Clock_MainCase_installation.jpg "LED-Matrix Clock Cableing")
 
+![LED-Matrix-Clock Closing](./resources/LED-Matrix-Clock_Case_closeing.jpg "LED-Matrix Clock Case M3 Screws Closing")
+
+![LED-Matrix-Clock Closed](./resources/LED-Matrix-Clock_Case_closed.jpg "LED-Matrix Clock Case Closed")
+
 ![LED-Matrix-Clock 22:37](./resources/LED-Matrix-Clock_2237.jpg "LED-Matrix-Clock 22:37")
+
+![LED-Matrix-Clock Bett 17:41](./resources/LED-Matrix-Clock_Bett.jpg "LED-Matrix-Clock 17:41")

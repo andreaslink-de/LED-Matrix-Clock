@@ -97,10 +97,10 @@ void doWeHaveSummerOrWinterTime()
   int h = rightNow.hour();
 
   // Debug:
-  //dow = 3;
-  //mon = 10;
-  //d = 28;
-  //h = 14;
+  //dow = 3;  // 1 (Mo.)
+  //mon = 10; // 10
+  //d = 28;   // 25
+  //h = 14;   // 1
 
   // As October has 31 days, we know that the last Sunday (dow=0) will always fall from the 25th to the 31st.
   // Outside this time it is for sure wintertime.
@@ -108,15 +108,15 @@ void doWeHaveSummerOrWinterTime()
   {
     setSummertime(false);
     return;
-  } else if (mon == 10 && d < 25)
+  } else if (mon == 10 && d < 26)
   {
     setSummertime(true);
     return;
-  } else if (dow == 0 && mon == 10 && d >= 25 && h >= 3)
+  } else if (dow == 0 && mon == 10 && d >= 26 && h >= 3)
   {
     setSummertime(false);
     return;
-  } else if (mon == 10 && d > 25)
+  } else if (mon == 10 && d > 26)
   {
     if (dow == 0 && h >= 3)
     {
